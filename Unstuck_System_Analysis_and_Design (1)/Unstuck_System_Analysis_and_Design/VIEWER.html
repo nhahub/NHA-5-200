@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UNSTUCK – System Analysis & Design Specification (DEPI / MCIT)</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'default',
+      securityLevel: 'loose',
+      themeVariables: {
+        primaryColor: '#F5EFC6',
+        primaryTextColor: '#231815',
+        primaryBorderColor: '#4D0E12',
+        lineColor: '#4D0E12',
+        secondaryColor: '#FAF7EA',
+        tertiaryColor: '#FFFFFF',
+        fontFamily: 'Plus Jakarta Sans, sans-serif'
+      }
+    });
+  </script>
+
+  <style>
+    /* ==========================================================================
+       UNSTUCK LUXURY ENGINEERING DESIGN SYSTEM
+       Root Pantone & Semantic Variables
+       ========================================================================== */
+    :root {
+      --pantone-yellow: #F5EFC6;
+      --pantone-yellow-border: #E5DCB5;
+      --pantone-yellow-glow: rgba(245, 239, 198, 0.45);
+      
+      --pantone-red: #4D0E12;
+      --pantone-red-hover: #38090C;
+      --pantone-red-soft: rgba(77, 14, 18, 0.08);
+      
+      --pantone-blue: #A5BCD6;
+      --pantone-blue-deep: #2A4C73;
+      --pantone-blue-soft: rgba(165, 188, 214, 0.22);
+      
+      --pantone-potting: #4A2E27;
+      --pantone-potting-light: #6E4940;
+      
+      --pantone-java: #231815;
+      --pantone-java-muted: #544946;
+      
+      --bg-page: #FAF8F5;
+      --bg-surface: #FFFFFF;
+      --bg-surface-elevated: #FFFFFF;
+      --bg-surface-warm: #FAF6EA;
+      
+      --border-light: #E7E0D6;
+      --border-subtle: #F0ECE4;
+      
+      --shadow-sm: 0 2px 6px rgba(35, 24, 21, 0.04);
+      --shadow-md: 0 8px 24px rgba(35, 24, 21, 0.06);
+      --shadow-lg: 0 16px 40px rgba(35, 24, 21, 0.09);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-page);
+      color: var(--pantone-java);
+      line-height: 1.68;
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Reading Progress Bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--pantone-yellow), var(--pantone-red));
+      width: 0%;
+      z-index: 2000;
+      transition: width 0.1s ease;
+    }
+
+    /* Top Executive Navigation Bar */
+    .top-bar {
+      background-color: var(--pantone-red);
+      color: #FFFFFF;
+      padding: 0.85rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(35, 24, 21, 0.18);
+    }
+    
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-badge {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brand-title span {
+      color: var(--pantone-yellow);
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .doc-meta-badge {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+      display: none;
+    }
+
+    @media (min-width: 900px) {
+      .doc-meta-badge { display: inline-block; }
+    }
+
+    .btn-print {
+      background: var(--pantone-yellow);
+      color: var(--pantone-java);
+      border: 1px solid var(--pantone-yellow-border);
+      padding: 0.45rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-print:hover {
+      background: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    /* Primary Wrapper Layout */
+    .wrapper {
+      display: flex;
+      max-width: 1560px;
+      margin: 0 auto;
+      min-height: calc(100vh - 60px);
+    }
+
+    /* Fixed Navigation Sidebar */
+    .sidebar {
+      width: 330px;
+      background: var(--bg-surface);
+      border-right: 1px solid var(--border-light);
+      padding: 2rem 1.25rem 2rem 1.5rem;
+      position: sticky;
+      top: 57px;
+      height: calc(100vh - 57px);
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .sidebar-header h3 {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: var(--pantone-potting-light);
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .sidebar ul { list-style: none; }
+    .sidebar li { margin-bottom: 0.25rem; }
+
+    .sidebar a {
+      display: block;
+      padding: 0.45rem 0.75rem;
+      color: var(--pantone-potting);
+      text-decoration: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.86rem;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      line-height: 1.4;
+    }
+
+    .sidebar a:hover {
+      background-color: var(--pantone-yellow);
+      color: var(--pantone-red);
+      font-weight: 600;
+      transform: translateX(3px);
+    }
+
+    .sidebar a.section-title {
+      font-weight: 800;
+      color: var(--pantone-java);
+      margin-top: 0.85rem;
+      font-size: 0.88rem;
+    }
+
+    /* Main Document Stage */
+    .main-content {
+      flex: 1;
+      padding: 3rem 4rem;
+      max-width: 1230px;
+    }
+
+    /* Formal Academic Title Cover Banner */
+    .cover-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 3.5rem 3rem;
+      margin-bottom: 3.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--pantone-red) 0%, var(--pantone-potting) 50%, var(--pantone-yellow) 100%);
+    }
+
+    .cover-institutions {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .inst-left h4 {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--pantone-red);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .inst-left p {
+      font-size: 0.85rem;
+      color: var(--pantone-potting);
+      font-weight: 600;
+    }
+
+    .inst-right {
+      text-align: right;
+    }
+
+    .inst-right span {
+      display: inline-block;
+      background: var(--pantone-yellow-soft);
+      border: 1px solid var(--pantone-yellow-border);
+      color: var(--pantone-potting);
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .cover-card h1 {
+      font-size: 2.6rem;
+      color: var(--pantone-java);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 0.8rem;
+    }
+
+    .cover-card .project-subtitle {
+      font-size: 1.25rem;
+      color: var(--pantone-potting-light);
+      font-weight: 500;
+      margin-bottom: 2rem;
+      max-width: 900px;
+    }
+
+    /* Metadata Block Table */
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      background: var(--bg-surface-warm);
+      border: 1px solid var(--pantone-yellow-border);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .meta-item .meta-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      color: var(--pantone-potting-light);
+      margin-bottom: 0.25rem;
+    }
+
+    .meta-item .meta-val {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--pantone-java);
+    }
+
+    /* Executive Abstract Box */
+    .abstract-box {
+      background: #FFFFFF;
+      border-left: 4px solid var(--pantone-red);
+      padding: 1.5rem 1.75rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .abstract-box h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      color: var(--pantone-red);
+      margin-bottom: 0.5rem;
+    }
+
+    .abstract-box p {
+      font-size: 0.94rem;
+      color: var(--pantone-potting);
+      line-height: 1.65;
+    }
+
+    /* Chapter Section Cards */
+    .section-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      margin-bottom: 3.5rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow 0.2s ease;
+    }
+
+    .section-card:hover {
+      box-shadow: var(--shadow-md);
+    }
+
+    .chapter-badge {
+      display: inline-block;
+      background: var(--pantone-red-soft);
+      color: var(--pantone-red);
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.65rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+
+    .section-card h2 {
+      font-size: 1.85rem;
+      color: var(--pantone-java);
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      border-bottom: 2px solid var(--pantone-yellow);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .section-card h3 {
+      font-size: 1.3rem;
+      color: var(--pantone-red);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin: 2.25rem 0 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-card h4 {
+      font-size: 1.05rem;
+      color: var(--pantone-java);
+      font-weight: 700;
+      margin: 1.5rem 0 0.6rem;
+    }
+
+    .section-card p {
+      font-size: 0.98rem;
+      color: var(--pantone-potting);
+      margin-bottom: 1rem;
+      line-height: 1.7;
+    }
+
+    .section-card ul, .section-card ol {
+      padding-left: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-card li {
+      font-size: 0.96rem;
+      color: var(--pantone-potting);
+      margin-bottom: 0.5rem;
+      line-height: 1.65;
+    }
+
+    /* Structured Callout Blocks */
+    .callout {
+      border-radius: var(--radius-sm);
+      padding: 1.25rem 1.5rem;
+      margin: 1.75rem 0;
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    .callout-decision {
+      background: #FAF7EA;
+      border-left: 4px solid var(--pantone-potting);
+      color: var(--pantone-potting);
+    }
+
+    .callout-decision strong {
+      color: var(--pantone-java);
+      display: block;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    .callout-security {
+      background: #FDF4F4;
+      border-left: 4px solid var(--pantone-red);
+      color: var(--pantone-red);
+    }
+
+    .callout-security strong {
+      display: block;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Crisp Data Tables */
+    .table-container {
+      overflow-x: auto;
+      margin: 1.75rem 0;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: #FFFFFF;
+    }
+
+    th {
+      background: var(--pantone-yellow);
+      color: var(--pantone-java);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--pantone-yellow-border);
+      text-align: left;
+    }
+
+    td {
+      padding: 0.85rem 1.2rem;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--pantone-potting);
+      vertical-align: top;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background-color: #FCFAF6; }
+    tr:hover td { background-color: #FAF4E4; }
+
+    /* Mermaid Diagram Canvas Container */
+    .diagram-figure {
+      margin: 2.25rem 0;
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      background: #FFFFFF;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+
+    .diagram-caption {
+      background: var(--bg-surface-warm);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--pantone-potting);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .diagram-canvas {
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+      overflow-x: auto;
+      background: #FFFFFF;
+    }
+
+    /* Monospace Code & Schema Blocks */
+    pre {
+      background: var(--pantone-java);
+      color: #FAF8F5;
+      padding: 1.4rem;
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      margin: 1.5rem 0;
+      box-shadow: 0 4px 12px rgba(35, 24, 21, 0.12);
+      border: 1px solid #352522;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Consolas', monospace;
+      font-size: 0.88em;
+      background: var(--pantone-yellow-soft);
+      color: var(--pantone-red);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid var(--pantone-yellow-border);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+      border: none;
+    }
+
+    /* Print Stylesheet for Submission Output */
+    @media print {
+      #progress-bar, .top-bar, .sidebar { display: none !important; }
+      .wrapper { display: block; width: 100%; margin: 0; }
+      .main-content { padding: 0 !important; max-width: 100% !important; }
+      .cover-card {
+        box-shadow: none !important;
+        border: 2px solid #000 !important;
+        page-break-after: always;
+        padding: 3rem 2rem !important;
+      }
+      .section-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        page-break-inside: avoid;
+        margin-bottom: 2rem !important;
+        padding: 2rem !important;
+      }
+      .diagram-figure {
+        page-break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #999 !important;
+      }
+      body { background: #FFFFFF !important; color: #000000 !important; font-size: 13px; }
+      th { background-color: #eee !important; color: #000 !important; }
+      a { text-decoration: none !important; color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Reading Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Executive Sticky Header -->
+  <header class="top-bar">
+    <div class="brand-group">
+      <div class="brand-badge">DEPI / MCIT</div>
+      <div class="brand-title">UNSTUCK <span>Engineering Specification</span></div>
+    </div>
+    <div class="top-actions">
+      <span class="doc-meta-badge">Document v1.0.0 | ISO/IEC/IEEE 29148 Standard</span>
+      <button class="btn-print" onclick="window.print()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print / Save PDF
+      </button>
+    </div>
+  </header>
+
+  <div class="wrapper">
+    <!-- Sticky Navigation Drawer -->
+    <nav class="sidebar">
+      <div class="sidebar-header">
+        <h3>Contents Navigation</h3>
+      </div>
+      <ul>
+        <li><a class="section-title" href="#ch-cover">Executive Cover Page</a></li>
+        
+        <li><a class="section-title" href="#ch1">1. Problem Statement & Objectives</a></li>
+        <li><a href="#ch1-1">1.1 Problem Statement & Solution</a></li>
+        <li><a href="#ch1-2">1.2 Use Case Diagram & Actors</a></li>
+        <li><a href="#ch1-3">1.3 Functional & Non-Functional Req.</a></li>
+        <li><a href="#ch1-4">1.4 Software Architecture</a></li>
+
+        <li><a class="section-title" href="#ch2">2. Database Design & Modeling</a></li>
+        <li><a href="#ch2-1">2.1 Entity-Relationship Diagram (ERD)</a></li>
+        <li><a href="#ch2-2">2.2 Logical & Physical Schema</a></li>
+        <li><a href="#ch2-3">2.3 Normalization & Indexing Strategy</a></li>
+
+        <li><a class="section-title" href="#ch3">3. Data Flow & System Behavior</a></li>
+        <li><a href="#ch3-1">3.1 Data Flow Diagrams (Context & L1)</a></li>
+        <li><a href="#ch3-2">3.2 Sequence Diagrams</a></li>
+        <li><a href="#ch3-3">3.3 Activity Diagrams</a></li>
+        <li><a href="#ch3-4">3.4 State Machine Diagrams</a></li>
+        <li><a href="#ch3-5">3.5 Class Diagram</a></li>
+
+        <li><a class="section-title" href="#ch4">4. UI/UX Design & Prototyping</a></li>
+        <li><a href="#ch4-1">4.1 Information Architecture & Wireframes</a></li>
+        <li><a href="#ch4-2">4.2 Pantone Design System & WCAG 2.1</a></li>
+
+        <li><a class="section-title" href="#ch5">5. System Deployment & Integration</a></li>
+        <li><a href="#ch5-1">5.1 Technology Matrix Specification</a></li>
+        <li><a href="#ch5-2">5.2 Deployment Topology Diagram</a></li>
+        <li><a href="#ch5-3">5.3 Component Diagram</a></li>
+
+        <li><a class="section-title" href="#ch6">6. Additional Deliverables</a></li>
+        <li><a href="#ch6-1">6.1 OpenAPI / Swagger REST Catalog</a></li>
+        <li><a href="#ch6-2">6.2 Automated Test Harness (100% Pass)</a></li>
+        <li><a href="#ch6-3">6.3 DevOps, CI/CD & Disaster Recovery</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content Stage -->
+    <main class="main-content">
+
+      <!-- COVER CARD -->
+      <section id="ch-cover" class="cover-card">
+        <div class="cover-institutions">
+          <div class="inst-left">
+            <h4>Arab Republic of Egypt</h4>
+            <p>Ministry of Communications and Information Technology (MCIT)</p>
+            <p>Digital Egypt Pioneers Initiative (DEPI)</p>
+          </div>
+          <div class="inst-right">
+            <span>Official Capstone Deliverable</span>
+          </div>
+        </div>
+
+        <h1>System Analysis & Design Specification</h1>
+        <div class="project-subtitle">
+          Engineering Architecture, Data Models, Behavioral Lifecycles, and Implementation Blueprint for <strong>UNSTUCK: Multi-Platform Freelance Intelligence & Proposal Automation Hub</strong>
+        </div>
+
+        <!-- Metadata Grid -->
+        <div class="meta-grid">
+          <div class="meta-item">
+            <div class="meta-label">Project Name</div>
+            <div class="meta-val">UNSTUCK Engine</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Author / Engineer</div>
+            <div class="meta-val">Aya Elsayed</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Track / Specialization</div>
+            <div class="meta-val">Full-Stack AI & Software Engineering</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Document Version</div>
+            <div class="meta-val">v1.0.0 (Release Candidate)</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Submission Date</div>
+            <div class="meta-val">November 2026</div>
+          </div>
+          <div class="meta-item">
+            <div class="meta-label">Standard Compliance</div>
+            <div class="meta-val">ISO/IEC/IEEE 29148:2018</div>
+          </div>
+        </div>
+
+        <!-- Executive Abstract -->
+        <div class="abstract-box">
+          <h4>Executive Abstract</h4>
+          <p>
+            The modern digital freelancing economy suffers from severe platform fragmentation across regional and international portals (Mostaql, Khamsat, Nafezly, Freelancer.com), forcing gig economy participants into labor-intensive manual monitoring and generic bidding under severe time constraints. This engineering specification details <strong>UNSTUCK</strong>: a high-throughput, decoupled platform that automates multi-portal web scraping, guarantees zero-duplicate persistence via PostgreSQL <code>UPSERT</code> operations, computes algorithmic fit scores against candidate skill vectors (Freelance DNA™), and synthesizes tailored proposals using GLM-4 Flash Large Language Models in under 3.0 seconds. Complete behavioral UML models, relational schemas, REST API contracts, and an automated 13-scenario test harness with a 100% pass rate are comprehensively documented herein.
+          </p>
+        </div>
+      </section>
+
+      <!-- CHAPTER 1 -->
+      <section id="ch1" class="section-card">
+        <span class="chapter-badge">Chapter 1.0</span>
+        <h2>1. Problem Statement & Objectives</h2>
+
+        <div id="ch1-1">
+          <h3>1.1 Problem Statement & Technical Solution</h3>
+          <p>
+            Freelance professionals in regional and global markets face critical operational bottlenecks that degrade contract conversion rates and waste billable hours:
+          </p>
+          <ol>
+            <li><strong>Cross-Portal Information Fragmentation:</strong> Freelancers must juggle between 4 disparate marketplaces (Mostaql, Khamsat, Nafezly, Freelancer.com), leading to missed opportunities and severe context switching.</li>
+            <li><strong>The First-Mover Conversion Advantage:</strong> Empirical marketplace research demonstrates that proposals submitted within the initial <strong>15 to 30 minutes</strong> of project posting yield up to an <strong>80% higher probability</strong> of client engagement. Manual inspection consistently misses this window.</li>
+            <li><strong>Low Relevancy Ratio & Cognitive Drain:</strong> Sifting through hundreds of off-target listings causes severe cognitive fatigue.</li>
+            <li><strong>Proposal Burnout & Generic Disqualification:</strong> Under time stress, freelancers resort to canned templates that clients systematically discard.</li>
+          </ol>
+
+          <div class="callout callout-decision">
+            <strong>The UNSTUCK Engineering Solution</strong>
+            UNSTUCK unifies multi-spider Scrapy crawlers, PostgreSQL real-time <code>ON CONFLICT (url) DO UPDATE</code> deduplication, algorithmic skill-fit scoring (Freelance DNA™), and GLM-4 Flash LLM proposal generation into a single responsive application with sub-200ms query latencies.
+          </div>
+        </div>
+
+        <div id="ch1-2">
+          <h3>1.2 Use Case Diagram & Actor Specifications</h3>
+          <p>The system interacts with human actors and external services across well-defined boundaries:</p>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 1.1: UML System Boundary Use Case Diagram</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+flowchart TD
+    Freelancer([👤 Freelancer / User])
+    Admin([🛠️ System Administrator])
+    SMTP[📧 SMTP Mail Server]
+    AI[🧠 GLM AI Engine]
+    Platforms[🌐 External Platforms: Mostaql, Khamsat, Nafezly, Freelancer]
+
+    subgraph UNSTUCK System Boundary
+        UC01(UC-01: Register & Request OTP)
+        UC02(UC-02: Verify OTP & Activate Account)
+        UC03(UC-03: User Login & Session Handling)
+        UC04(UC-04: Manage Freelance DNA Profile)
+        UC05(UC-05: Browse & Search Opportunities)
+        UC06(UC-06: Match Skills & Compute Score)
+        UC07(UC-07: Generate Tailored AI Proposal)
+        UC08(UC-08: Bookmark / Save Opportunity)
+        UC09(UC-09: Trigger Platform Scraping)
+        UC10(UC-10: Synchronize JSON to Database)
+        UC11(UC-11: Monitor Health & Platform Statistics)
+    end
+
+    Freelancer --> UC01
+    Freelancer --> UC02
+    Freelancer --> UC03
+    Freelancer --> UC04
+    Freelancer --> UC05
+    Freelancer --> UC06
+    Freelancer --> UC07
+    Freelancer --> UC08
+
+    Admin --> UC03
+    Admin --> UC09
+    Admin --> UC10
+    Admin --> UC11
+
+    UC01 -.->|Dispatches TLS Code| SMTP
+    UC06 -.->|Queries Data| UC05
+    UC07 -.->|Inference| AI
+    UC09 -.->|Scrapes Gigs| Platforms
+              </pre>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Use Case ID</th>
+                  <th>Actor</th>
+                  <th>Preconditions</th>
+                  <th>Primary Success Flow</th>
+                  <th>Postconditions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>UC-01</strong></td>
+                  <td>Freelancer</td>
+                  <td>Unregistered / Unverified</td>
+                  <td>Validates password regex, hashes via bcrypt, writes SHA-256 OTP digest, dispatches TLS email.</td>
+                  <td>Pending user record; OTP delivered to inbox.</td>
+                </tr>
+                <tr>
+                  <td><strong>UC-02</strong></td>
+                  <td>Freelancer</td>
+                  <td>Pending account exists</td>
+                  <td>Verifies 6-digit code against SHA-256 hash, enforces attempts &lt; 5 and expiry &lt; 5 min.</td>
+                  <td><code>is_verified = TRUE</code>; account activated.</td>
+                </tr>
+                <tr>
+                  <td><strong>UC-05</strong></td>
+                  <td>Freelancer</td>
+                  <td>DNA profile configured</td>
+                  <td>Queries PostgreSQL or JSON fallback, computes 0–100% skill overlap score, returns sorted list.</td>
+                  <td>Ranked opportunities displayed with match badges.</td>
+                </tr>
+                <tr>
+                  <td><strong>UC-07</strong></td>
+                  <td>Freelancer</td>
+                  <td>Target project chosen</td>
+                  <td>Assembles project brief and user profile, invokes GLM-4 Flash API, outputs tailored proposal.</td>
+                  <td>Ready-to-copy proposal rendered in editor.</td>
+                </tr>
+                <tr>
+                  <td><strong>UC-09</strong></td>
+                  <td>Admin / n8n</td>
+                  <td>Network connection online</td>
+                  <td>Spawns Scrapy runner, crawls 4 platforms, executes atomic SQL UPSERT on project URLs.</td>
+                  <td>Database updated; zero duplicate rows.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch1-3">
+          <h3>1.3 Functional & Non-Functional Requirements (MoSCoW Matrix)</h3>
+          
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Req ID</th>
+                  <th>Domain</th>
+                  <th>Detailed Requirement Specification</th>
+                  <th>Verification Metric</th>
+                  <th>Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>FR-01</strong></td>
+                  <td>Data Crawling</td>
+                  <td>Autonomous multi-spider crawling of Mostaql, Khamsat, Nafezly, and Freelancer.com.</td>
+                  <td>Extracts titles, budgets, deadlines, and skill tags.</td>
+                  <td>Must Have</td>
+                </tr>
+                <tr>
+                  <td><strong>FR-02</strong></td>
+                  <td>Persistence</td>
+                  <td>Real-time atomic UPSERT execution based on unique canonical URLs.</td>
+                  <td><code>ON CONFLICT (url) DO UPDATE</code>.</td>
+                  <td>Must Have</td>
+                </tr>
+                <tr>
+                  <td><strong>FR-03</strong></td>
+                  <td>Security</td>
+                  <td>6-digit email OTP verification with SHA-256 hashing and 5-min expiration.</td>
+                  <td>Plaintext OTP never exposed to client or API.</td>
+                  <td>Must Have</td>
+                </tr>
+                <tr>
+                  <td><strong>FR-04</strong></td>
+                  <td>Algorithmic Fit</td>
+                  <td>Compute 0–100% skill match score and contextual keyword overlap.</td>
+                  <td>Returns matched skills, missing skills, and reasons.</td>
+                  <td>Must Have</td>
+                </tr>
+                <tr>
+                  <td><strong>FR-05</strong></td>
+                  <td>AI Synthesis</td>
+                  <td>Tailored proposal generation in English and Arabic with Value/Direct tones.</td>
+                  <td>Latency &lt; 3.5s via GLM-4 Flash API.</td>
+                  <td>Must Have</td>
+                </tr>
+                <tr>
+                  <td><strong>NFR-01</strong></td>
+                  <td>Performance</td>
+                  <td>API read queries (<code>/api/projects</code>, <code>/api/status</code>) must respond &lt; 200ms.</td>
+                  <td>Measured via Swagger UI &amp; Locust benchmarks.</td>
+                  <td>Critical</td>
+                </tr>
+                <tr>
+                  <td><strong>NFR-02</strong></td>
+                  <td>Resilience</td>
+                  <td>Automatic failover to structured JSON snapshots if PostgreSQL is offline.</td>
+                  <td>99.9% read availability during DB maintenance.</td>
+                  <td>Critical</td>
+                </tr>
+                <tr>
+                  <td><strong>NFR-03</strong></td>
+                  <td>Cryptography</td>
+                  <td>Password hashing via salted bcrypt (work factor 12).</td>
+                  <td>Resistance to GPU/ASIC rainbow-table attacks.</td>
+                  <td>Critical</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch1-4">
+          <h3>1.4 Decoupled Multi-Tier Software Architecture</h3>
+          <p>
+            UNSTUCK utilizes a modular, decoupled architecture separating the Single Page Application (SPA), the REST API application server, the asynchronous crawling engine, the relational storage layer, and external cloud AI services.
+          </p>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 1.2: Decoupled Multi-Tier System Architecture</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+graph TB
+    subgraph Client_Tier [Client Presentation Tier - React 18 & Vite]
+        UI[🖥️ Responsive SPA Web Application]
+        State[📦 Local Storage & State Management]
+        UI <--> State
+    end
+
+    subgraph API_Gateway [Application Service Tier - FastAPI]
+        Router[🔀 Asynchronous REST API Router]
+        AuthService[🛡️ Auth & Security Controller]
+        MatchEngine[🎯 Skill Matching Engine]
+        AIGenerator[🤖 AI Proposal Service]
+        ScraperManager[🕷️ Spider Process Manager]
+
+        Router --> AuthService
+        Router --> MatchEngine
+        Router --> AIGenerator
+        Router --> ScraperManager
+    end
+
+    subgraph External_Cloud [External Cloud & Automation Services]
+        GLM[🧠 GLM-4 Flash LLM API]
+        SMTP[📧 TLS SMTP Server - Port 587]
+        N8N[⏰ n8n Automation Engine]
+    end
+
+    subgraph Crawler_Tier [Data Ingestion Tier - Scrapy]
+        Spiders[🕸️ Spiders: Mostaql, Khamsat, Nafezly, Freelancer]
+        Pipeline[⚙️ Normalization & PostgreSQL Pipeline]
+        Spiders --> Pipeline
+    end
+
+    subgraph Persistence_Tier [Persistence Tier]
+        PG[(🐘 PostgreSQL 16 Alpine - Native UPSERT)]
+        SQLite[(🗄️ SQLite Auth Fallback)]
+        JSONFiles[📂 Local Structured JSON Cache]
+    end
+
+    UI -- "HTTPS / REST JSON" --> Router
+    AuthService -- "Send OTP Email" --> SMTP
+    AuthService -- "Persist Users" --> PG
+    AuthService -. "Failover" .-> SQLite
+    MatchEngine -- "Query Indexed Gigs" --> PG
+    MatchEngine -. "Failover" .-> JSONFiles
+    AIGenerator -- "Inference Request" --> GLM
+    ScraperManager -- "CLI Subprocess" --> Spiders
+    Pipeline -- "ON CONFLICT (url) DO UPDATE" --> PG
+    Pipeline -- "Write Cache Backup" --> JSONFiles
+    N8N -- "POST /api/scrape" --> Router
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 2 -->
+      <section id="ch2" class="section-card">
+        <span class="chapter-badge">Chapter 2.0</span>
+        <h2>2. Database Design & Data Modeling</h2>
+
+        <div id="ch2-1">
+          <h3>2.1 Entity-Relationship Diagram (ERD)</h3>
+          <p>
+            The relational schema is engineered to sustain high-throughput crawler ingestion while enforcing referential integrity and user credential security.
+          </p>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 2.1: Relational Entity-Relationship Diagram (Crow's Foot Notation)</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+erDiagram
+    USERS ||--o{ OTP_VERIFICATIONS : "requests / verifies"
+    USERS ||--o{ USER_SAVED_PROJECTS : "bookmarks"
+    PROJECTS ||--o{ USER_SAVED_PROJECTS : "bookmarked by"
+    USERS ||--o{ GENERATED_PROPOSALS : "generates"
+    PROJECTS ||--o{ GENERATED_PROPOSALS : "target of"
+
+    USERS {
+        int id PK "SERIAL"
+        string full_name "VARCHAR(150)"
+        string email UK "VARCHAR(255)"
+        string password_hash "VARCHAR(255)"
+        boolean is_verified "DEFAULT FALSE"
+        timestamp created_at "WITH TIME ZONE"
+        timestamp verified_at "WITH TIME ZONE"
+    }
+
+    OTP_VERIFICATIONS {
+        int id PK "SERIAL"
+        string email FK "VARCHAR(255)"
+        string otp_hash "VARCHAR(255)"
+        int attempts "DEFAULT 0"
+        int max_attempts "DEFAULT 5"
+        boolean is_used "DEFAULT FALSE"
+        timestamp expires_at "WITH TIME ZONE"
+        timestamp last_sent_at "WITH TIME ZONE"
+        timestamp created_at "WITH TIME ZONE"
+    }
+
+    PROJECTS {
+        int id PK "SERIAL"
+        string platform "VARCHAR(100)"
+        string platform_key "VARCHAR(50)"
+        text title "TEXT NOT NULL"
+        text url UK "TEXT UNIQUE NOT NULL"
+        string price "VARCHAR(100)"
+        string duration "VARCHAR(100)"
+        string published_at "VARCHAR(100)"
+        text brief "TEXT"
+        jsonb requirements "JSONB DEFAULT '[]'"
+        timestamp scraped_at "WITH TIME ZONE"
+        timestamp updated_at "WITH TIME ZONE"
+    }
+
+    USER_SAVED_PROJECTS {
+        int id PK "SERIAL"
+        int user_id FK "REFERENCES users(id)"
+        int project_id FK "REFERENCES projects(id)"
+        timestamp saved_at "WITH TIME ZONE"
+        text user_notes "TEXT"
+    }
+
+    GENERATED_PROPOSALS {
+        int id PK "SERIAL"
+        int user_id FK "REFERENCES users(id)"
+        int project_id FK "REFERENCES projects(id)"
+        text proposal_text "TEXT NOT NULL"
+        string tone "VARCHAR(50)"
+        string language "VARCHAR(20)"
+        timestamp created_at "WITH TIME ZONE"
+    }
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div id="ch2-2">
+          <h3>2.2 Physical Schema Data Dictionary</h3>
+          
+          <h4>Table: <code>projects</code> (Central Ingestion Store)</h4>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Column Name</th><th>Data Type</th><th>Constraints</th><th>Default</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>id</code></td><td>SERIAL</td><td>PRIMARY KEY</td><td>Auto-inc</td><td>Internal surrogate identifier.</td></tr>
+                <tr><td><code>platform</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>None</td><td>Display name (Mostaql, Khamsat, Nafezly, Freelancer).</td></tr>
+                <tr><td><code>platform_key</code></td><td>VARCHAR(50)</td><td>NOT NULL</td><td>None</td><td>Normalized key for indexed filtering.</td></tr>
+                <tr><td><code>title</code></td><td>TEXT</td><td>NOT NULL</td><td>None</td><td>Full opportunity title.</td></tr>
+                <tr><td><code>url</code></td><td>TEXT</td><td>UNIQUE, NOT NULL</td><td>None</td><td>Canonical URL powering PostgreSQL UPSERT.</td></tr>
+                <tr><td><code>price</code></td><td>VARCHAR(100)</td><td>NULLABLE</td><td>None</td><td>Offered budget or compensation range.</td></tr>
+                <tr><td><code>duration</code></td><td>VARCHAR(100)</td><td>NULLABLE</td><td>None</td><td>Expected delivery timeline.</td></tr>
+                <tr><td><code>brief</code></td><td>TEXT</td><td>NULLABLE</td><td>None</td><td>Full project description and client instructions.</td></tr>
+                <tr><td><code>requirements</code></td><td>JSONB</td><td>NOT NULL</td><td><code>'[]'::jsonb</code></td><td>Structured skill tags array indexed with GIN.</td></tr>
+                <tr><td><code>updated_at</code></td><td>TIMESTAMPTZ</td><td>NOT NULL</td><td>CURRENT_TIMESTAMP</td><td>Synchronized on every UPSERT operation.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch2-3">
+          <h3>2.3 Normalization Proof & High-Throughput Indexing Strategy</h3>
+          <p>
+            The schema strictly complies with <strong>Third Normal Form (3NF)</strong>:
+          </p>
+          <ul>
+            <li><strong>1NF:</strong> All column attributes contain atomic values. The <code>requirements</code> column leverages PostgreSQL's binary <code>JSONB</code> format, maintaining set-level indexing while accommodating heterogeneous multi-platform skill representations.</li>
+            <li><strong>2NF:</strong> Every non-key attribute is fully functionally dependent on the primary key (no partial dependencies).</li>
+            <li><strong>3NF:</strong> Transitive dependencies are eliminated. User authentication attributes depend solely on candidate keys (<code>id</code> and <code>email</code>).</li>
+          </ul>
+
+          <div class="callout callout-decision">
+            <strong>Architectural Indexing Design</strong>
+            To ensure sub-millisecond query execution across large datasets, four indexes are maintained:
+            <ol>
+              <li><code>CREATE UNIQUE INDEX idx_projects_url ON projects(url);</code> — Enforces non-blocking UPSERT concurrency.</li>
+              <li><code>CREATE INDEX idx_projects_platform_key ON projects(platform_key);</code> — Powers instant platform tabs.</li>
+              <li><code>CREATE INDEX idx_projects_published_at ON projects(published_at DESC);</code> — Accelerates timeline queries.</li>
+              <li><code>CREATE INDEX idx_projects_requirements_gin ON projects USING GIN(requirements);</code> — Optimizes JSONB skill containment lookups.</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 3 -->
+      <section id="ch3" class="section-card">
+        <span class="chapter-badge">Chapter 3.0</span>
+        <h2>3. Data Flow & System Behavior</h2>
+
+        <div id="ch3-1">
+          <h3>3.1 Data Flow Diagrams (DFD Level 0 & Level 1)</h3>
+          
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.1: DFD Level 0 – System Context Diagram</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+flowchart LR
+    User[👤 Freelancer / User]
+    Admin[🛠️ Administrator]
+    SMTP[📧 SMTP Mail Gateway]
+    Platforms[🌐 Freelance Portals]
+    AI_Service[🧠 GLM AI Engine]
+
+    System((0.0<br/>UNSTUCK Platform))
+
+    User -- "Credentials & DNA Profile" --> System
+    User -- "OTP Code & Proposal Settings" --> System
+    System -- "Auth Tokens & Scored Matches" --> User
+    System -- "Synthesized Proposals" --> User
+
+    Admin -- "Crawl & Sync Commands" --> System
+    System -- "Health Metrics & Row Counts" --> Admin
+
+    Platforms -- "Raw HTML Gigs" --> System
+    System -- "Dispatches TLS OTP" --> SMTP
+    System -- "Project Brief & Prompt" --> AI_Service
+    AI_Service -- "Tailored Proposal" --> System
+              </pre>
+            </div>
+          </div>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.2: DFD Level 1 – Subsystem Functional Decomposition</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+flowchart TD
+    User[👤 Freelancer]
+    Admin[🛠️ Administrator]
+    Platforms[🌐 Freelance Portals]
+    SMTP[📧 SMTP Server]
+    GLM[🧠 GLM AI API]
+
+    P1["1.0<br/>Auth & OTP Verification"]
+    P2["2.0<br/>Web Crawling & Extraction"]
+    P3["3.0<br/>Normalization & UPSERT"]
+    P4["4.0<br/>DNA Matching & Ranking"]
+    P5["5.0<br/>AI Proposal Studio"]
+
+    D1[("D1: Users Store")]
+    D2[("D2: Projects Database")]
+    D3[("D3: OTP Tokens Store")]
+    D4[("D4: Generated Proposals")]
+
+    User -->|Signup Info| P1
+    P1 -->|Hash & Expiry| D3
+    P1 -->|Dispatch OTP| SMTP
+    User -->|Submit OTP| P1
+    D3 -->|Validate Hash| P1
+    P1 -->|Verified User| D1
+
+    Admin -->|Scrape Command| P2
+    Platforms -->|HTML Pages| P2
+    P2 -->|Raw Items| P3
+    P3 -->|UPSERT on URL| D2
+
+    User -->|DNA Skills| P4
+    D2 -->|Indexed Projects| P4
+    P4 -->|Scored Matches| User
+
+    User -->|Tone & Language| P5
+    D2 -->|Project Brief| P5
+    D1 -->|User Profile| P5
+    P5 -->|Prompt| GLM
+    GLM -->|Proposal Text| P5
+    P5 -->|Store Draft| D4
+    P5 -->|Formatted Proposal| User
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div id="ch3-2">
+          <h3>3.2 Sequence Diagrams</h3>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.3: Sequence Diagram – Secure Registration & OTP Verification Flow</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor User as 👤 Freelancer
+    participant UI as 🖥️ React SPA
+    participant API as ⚡ FastAPI Backend
+    participant Auth as 🛡️ Auth Controller
+    participant DB as 🐘 PostgreSQL
+    participant SMTP as 📧 SMTP Server
+
+    User->>UI: Submits Full Name, Email, Password
+    UI->>API: POST /api/auth/register
+    API->>Auth: Validate password complexity (regex)
+    Auth->>Auth: Compute salted bcrypt hash (rounds=12)
+    Auth->>Auth: Generate 6-digit OTP & compute SHA-256
+    Auth->>DB: INSERT into users & otp_verifications
+    Auth->>SMTP: Connect STARTTLS (Port 587) & send email
+    SMTP-->>User: Delivers 6-digit OTP code to inbox
+    API-->>UI: 200 OK (Redirect to /verify-otp)
+
+    User->>UI: Submits 6-digit code
+    UI->>API: POST /api/auth/verify-otp {email, otp}
+    API->>Auth: Check attempts < 5 and expiry > NOW()
+    Auth->>Auth: Compare SHA-256(input) with stored hash
+    alt Valid OTP
+        Auth->>DB: UPDATE users SET is_verified = TRUE
+        Auth->>DB: UPDATE otp_verifications SET is_used = TRUE
+        API-->>UI: 200 OK (Navigate to Onboarding / DNA)
+    else Invalid / Expired OTP
+        Auth->>DB: UPDATE otp_verifications SET attempts = attempts + 1
+        API-->>UI: 400 Bad Request (Display error alert)
+    end
+              </pre>
+            </div>
+          </div>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.4: Sequence Diagram – Autonomous Ingestion & UPSERT Pipeline</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor Cron as ⏰ n8n / Admin
+    participant API as ⚡ FastAPI Server
+    participant Runner as 🏃 Scrapy Runner (run.py)
+    participant Spiders as 🕸️ Platform Spiders
+    participant Pipeline as ⚙️ Database Pipeline
+    participant DB as 🐘 PostgreSQL Database
+    participant Cache as 📂 Local JSON Cache
+
+    Cron->>API: POST /api/scrape {platforms: ["all"]}
+    API->>Runner: Spawn subprocess (run.py --spider all)
+    API-->>Cron: 202 Accepted {message: "started"}
+
+    par Parallel Crawling
+        Runner->>Spiders: Crawl Mostaql
+        Spiders-->>Pipeline: Yield ProjectItem
+    and
+        Runner->>Spiders: Crawl Khamsat
+        Spiders-->>Pipeline: Yield ProjectItem
+    and
+        Runner->>Spiders: Crawl Nafezly
+        Spiders-->>Pipeline: Yield ProjectItem
+    and
+        Runner->>Spiders: Crawl Freelancer.com
+        Spiders-->>Pipeline: Yield ProjectItem
+    end
+
+    Pipeline->>DB: INSERT INTO projects (...) ON CONFLICT (url) DO UPDATE
+    DB-->>Pipeline: Row committed (updated_at refreshed)
+    Pipeline->>Cache: Write synchronized backup to output/*.json
+    Runner-->>API: Process exit 0
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div id="ch3-3">
+          <h3>3.3 Activity Diagrams</h3>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.5: Activity Diagram – Freelancer Operational Journey</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+flowchart TD
+    Start([🟢 Start]) --> Reg[Register Account: Name, Email, Password]
+    Reg --> SubmitReg[Submit Form]
+    SubmitReg --> WaitOTP[Receive 6-digit OTP via Email]
+    WaitOTP --> InputOTP[Enter OTP on Verification Screen]
+    
+    InputOTP --> ValidOTP{Is OTP Valid & Unexpired?}
+    ValidOTP -- No --> CheckAttempts{Attempts < 5?}
+    CheckAttempts -- Yes --> RetryOTP[Display Error & Retry Code]
+    RetryOTP --> InputOTP
+    CheckAttempts -- No --> Blocked[Revoke Token - Request Resend]
+    Blocked --> WaitOTP
+
+    ValidOTP -- Yes --> ActivateUser[Activate Account: is_verified = TRUE]
+    ActivateUser --> SetupDNA[Configure Freelance DNA: Skills & Rates]
+    SetupDNA --> Dashboard[Access 'Your Signal Today' Dashboard]
+    
+    Dashboard --> Browse[Browse Live Opportunities]
+    Browse --> RunMatch[Trigger Algorithmic Skill Matching]
+    RunMatch --> ViewMatches[Review Match Scores & Missing Skills]
+    
+    ViewMatches --> SelectJob[Select High-Probability Project]
+    SelectJob --> GenProp[Configure AI Proposal: Select Tone & Language]
+    GenProp --> InvokeAI[Call AI Proposal Engine]
+    InvokeAI --> ReviewProp[Review & Polish in Proposal Studio]
+    ReviewProp --> CopyClipboard[One-Click Copy to Clipboard]
+    CopyClipboard --> SubmitBid[Submit Bid on Target Portal]
+    SubmitBid --> End([🔴 Complete])
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div id="ch3-4">
+          <h3>3.4 State Machine Diagrams</h3>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.6: State Machine Diagram – User Account Lifecycle</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+stateDiagram-v2
+    [*] --> Unregistered
+
+    Unregistered --> PendingVerification : Submit Registration (Password Hashed)
+    
+    state PendingVerification {
+        [*] --> AwaitingOTP
+        AwaitingOTP --> AwaitingOTP : Resend OTP (60s Cooldown)
+        AwaitingOTP --> OTPFailed : Invalid Code (attempts < 5)
+        OTPFailed --> AwaitingOTP : Retry Code
+    }
+
+    PendingVerification --> VerifiedActive : Valid 6-Digit OTP Submitted
+    PendingVerification --> VerificationLocked : Max Attempts Exceeded (>= 5)
+    VerificationLocked --> PendingVerification : Request New Code
+
+    state VerifiedActive {
+        [*] --> ProfileIncomplete
+        ProfileIncomplete --> DNAConfigured : Enter Skills & Preferences
+        DNAConfigured --> ActiveBrowsing : Browse & Search Opportunities
+        ActiveBrowsing --> GeneratingProposals : AI Proposal Synthesis
+        GeneratingProposals --> ActiveBrowsing : Proposal Saved / Copied
+    }
+
+    VerifiedActive --> LoggedOut : User Logs Out / Session Expires
+    LoggedOut --> VerifiedActive : Login Success (Password Verified)
+              </pre>
+            </div>
+          </div>
+        </div>
+
+        <div id="ch3-5">
+          <h3>3.5 Class Diagram (Object-Oriented Design)</h3>
+
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 3.7: UML Class Diagram – Domain Models & Controllers</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+classDiagram
+    class User {
+        +int id
+        +string full_name
+        +string email
+        +string password_hash
+        +bool is_verified
+        +datetime created_at
+        +datetime verified_at
+        +verify_password(plain_password) bool
+        +mark_verified() void
+    }
+
+    class OTPVerification {
+        +int id
+        +string email
+        +string otp_hash
+        +int attempts
+        +int max_attempts
+        +bool is_used
+        +datetime expires_at
+        +is_expired() bool
+        +increment_attempts() int
+        +verify_code(plain_otp) bool
+    }
+
+    class Project {
+        +int id
+        +string platform
+        +string platform_key
+        +string title
+        +string url
+        +string price
+        +string duration
+        +string published_at
+        +string brief
+        +list requirements
+        +datetime updated_at
+        +to_dict() dict
+    }
+
+    class DatabaseManager {
+        -dict db_config
+        +get_connection() Connection
+        +get_db_cursor(commit) Cursor
+        +init_db() void
+        +query_projects(platforms, q, limit, offset) tuple
+        +upsert_project(conn, item, platform_key) bool
+        +sync_json_files_to_db() dict
+    }
+
+    class AuthService {
+        -string smtp_host
+        -int smtp_port
+        +init_auth_tables() void
+        +register_pending_user(name, email, password) dict
+        +verify_email_otp(email, otp) dict
+        +resend_otp(email) dict
+        +authenticate_user(email, password) dict
+        -send_otp_email(to_email, otp) bool
+        -hash_otp(otp) string
+    }
+
+    class SkillMatchingEngine {
+        +match_skills_and_score(user_skills, project_skills, title, brief) dict
+        -calculate_overlap(user_skills, project_skills) float
+        -scan_text_for_keywords(text, skills) list
+    }
+
+    class AIProposalEngine {
+        -string api_key
+        -string base_url
+        -string model_name
+        +generate_ai_proposal(title, brief, skills, user_profile, tone, language) dict
+        -call_glm_chat(messages, temperature) string
+        -generate_fallback_template(title, brief, profile, tone, language) string
+    }
+
+    User "1" o-- "0..*" OTPVerification : requests
+    AuthService ..> User : manages
+    AuthService ..> OTPVerification : validates
+    DatabaseManager ..> Project : stores & retrieves
+    SkillMatchingEngine ..> Project : evaluates
+    AIProposalEngine ..> Project : analyzes
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 4 -->
+      <section id="ch4" class="section-card">
+        <span class="chapter-badge">Chapter 4.0</span>
+        <h2>4. UI/UX Design & Prototyping</h2>
+
+        <div id="ch4-1">
+          <h3>4.1 Information Architecture & Key Screen Schematics</h3>
+          <p>
+            The Single Page Application is organized into public authentication gates and an authenticated intelligence workspace. Below are structural ASCII schematics of key views:
+          </p>
+
+          <h4>View: "Your Signal Today" Intelligence Hub (`YourSignalToday.jsx`)</h4>
+          <pre><code>+-----------------------------------------------------------------------------------+
+| [UNSTUCK]  Signal Today   Opportunities   Saved(4)   Market Pulse   DNA  [User ▼] |
++-----------------------------------------------------------------------------------+
+|  👋 Welcome back, Ahmed! | Freelance DNA: Full-Stack React & Python | Match Tier: High|
+|                                                                                   |
+|  +-------------------+  +-------------------+  +-------------------+  +---------+ |
+|  | 🎯 Top Match Score|  | ⚡ Fresh Gigs 24h |  | 📝 Proposals Sent |  | ⏱️ Avg..| |
+|  |      96% Fit      |  |     48 New Jobs   |  |     12 Generated  |  | < 2 min | |
+|  +-------------------+  +-------------------+  +-------------------+  +---------+ |
+|                                                                                   |
+|  🔥 HIGHEST PROBABILITY OPPORTUNITIES TODAY                                       |
+|  +------------------------------------------------------------------------------+ |
+|  | [Mostaql] Build Intelligent Dashboard in React & FastAPI      | 🌟 96% MATCH   | |
+|  | Budget: $150 - $300 | Duration: 5 days | Published: 22m ago                  | |
+|  | Skills: [React] [FastAPI] [PostgreSQL] [Tailwind]                           | |
+|  | Why: Matches 4/4 core skills from your Freelance DNA profile                 | |
+|  |             [ 📄 View Details ]    [ 🤖 Generate Proposal ]                  | |
+|  +------------------------------------------------------------------------------+ |
++-----------------------------------------------------------------------------------+</code></pre>
+        </div>
+
+        <div id="ch4-2">
+          <h3>4.2 Pantone Design Tokens & Accessibility (WCAG 2.1 AA)</h3>
+          <p>
+            Implemented in <code>src/design-system.css</code>, the aesthetic palette pairs luxury editorial tones with high-contrast accessibility:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Role</th><th>Pantone Token Name</th><th>Hex Code</th><th>RGB Value</th><th>Contrast Ratio (WCAG)</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Accent Glow</td><td>Transparent Yellow</td><td><code>#F5EFC6</code></td><td>245, 239, 198</td><td>Badge accent & glow</td></tr>
+                <tr><td>Primary CTA</td><td>Sceptre Red</td><td><code>#4D0E12</code></td><td>77, 14, 18</td><td>9.2:1 (AAA High Contrast)</td></tr>
+                <tr><td>Secondary</td><td>Cerulean Blue</td><td><code>#A5BCD6</code></td><td>165, 188, 214</td><td>Platform identifier badges</td></tr>
+                <tr><td>Body Typography</td><td>Potting Soil</td><td><code>#4A2E27</code></td><td>74, 46, 39</td><td>7.8:1 (AA Body Compliant)</td></tr>
+                <tr><td>Display Text</td><td>Java Brown</td><td><code>#231815</code></td><td>35, 24, 21</td><td>14.8:1 (Exceptional Contrast)</td></tr>
+                <tr><td>Page Canvas</td><td>Warm Cream</td><td><code>#FAF8F5</code></td><td>250, 248, 245</td><td>Glare-free background</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 5 -->
+      <section id="ch5" class="section-card">
+        <span class="chapter-badge">Chapter 5.0</span>
+        <h2>5. System Deployment & Integration</h2>
+
+        <div id="ch5-1">
+          <h3>5.1 Comprehensive Technology Matrix</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Tier</th><th>Technology</th><th>Version</th><th>Purpose & Justification</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Frontend</td><td>React SPA</td><td>18.2.0</td><td>Declarative stateful component tree with fast transitions.</td></tr>
+                <tr><td>Bundler</td><td>Vite</td><td>5.0.0</td><td>Sub-second HMR and optimized tree-shaken rollup builds.</td></tr>
+                <tr><td>API Framework</td><td>FastAPI</td><td>0.109.0</td><td>High-throughput asynchronous non-blocking ASGI web server.</td></tr>
+                <tr><td>Crawling</td><td>Scrapy</td><td>2.11.0</td><td>Twisted event-loop multi-spider parallel web extraction.</td></tr>
+                <tr><td>Relational DB</td><td>PostgreSQL</td><td>16-alpine</td><td>ACID persistence, native JSONB, and atomic UPSERT on URLs.</td></tr>
+                <tr><td>Security</td><td>Bcrypt / SHA-256</td><td>4.1.0</td><td>Salted password hashing and cryptographic OTP validation.</td></tr>
+                <tr><td>AI Engine</td><td>GLM-4 Flash</td><td>Cloud API</td><td>Low-latency contextual LLM proposal generation.</td></tr>
+                <tr><td>Orchestration</td><td>Docker Compose</td><td>v3.8</td><td>Container network isolation and persistent storage volumes.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch5-2">
+          <h3>5.2 Physical & Containerized Deployment Topology</h3>
+          
+          <div class="diagram-figure">
+            <div class="diagram-caption">Figure 5.1: Physical Deployment & Container Topology</div>
+            <div class="diagram-canvas">
+              <pre class="mermaid">
+graph TB
+    Browser[🖥️ Client Web Browser: Chrome / Edge / Safari]
+    
+    subgraph Host_Server [Host Machine / Cloud Linux VM]
+        subgraph Docker_Network [Docker Network: Bridge]
+            FrontendContainer[Static Web Server / Vite<br/>Port: 5173]
+            FastAPIContainer[FastAPI ASGI Application<br/>Port: 8000]
+            PostgresContainer[(PostgreSQL 16 DBMS<br/>Port: 5432)]
+            N8NContainer[n8n Workflow Engine<br/>Port: 5678]
+        end
+
+        LocalDisk[📂 Persistent Storage: postgres_data & output/*.json]
+        PostgresContainer --- LocalDisk
+    end
+
+    subgraph External_Cloud [External Cloud Services]
+        GLM_API[🧠 GLM-4 Flash API<br/>open.bigmodel.cn:443]
+        SMTP_Server[📧 Gmail / Custom SMTP<br/>smtp.gmail.com:587]
+        Target1[🌐 Mostaql.com]
+        Target2[🌐 Khamsat.com]
+        Target3[🌐 Nafezly.com]
+        Target4[🌐 Freelancer.com]
+    end
+
+    Browser -- "HTTP :5173" --> FrontendContainer
+    Browser -- "REST JSON :8000" --> FastAPIContainer
+    FastAPIContainer -- "TCP SQL :5432" --> PostgresContainer
+    N8NContainer -- "HTTP POST /api/scrape" --> FastAPIContainer
+    FastAPIContainer -- "HTTPS :443" --> GLM_API
+    FastAPIContainer -- "TLS :587" --> SMTP_Server
+    FastAPIContainer -- "Crawl HTML Gigs" --> Target1
+    FastAPIContainer -- "Crawl HTML Gigs" --> Target2
+    FastAPIContainer -- "Crawl HTML Gigs" --> Target3
+    FastAPIContainer -- "Crawl HTML Gigs" --> Target4
+              </pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CHAPTER 6 -->
+      <section id="ch6" class="section-card">
+        <span class="chapter-badge">Chapter 6.0</span>
+        <h2>6. Additional Deliverables</h2>
+
+        <div id="ch6-1">
+          <h3>6.1 OpenAPI / RESTful Endpoints Catalog</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>HTTP Verb</th><th>Endpoint URI</th><th>Request Parameters / Body</th><th>Success Response</th><th>Description</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><code>GET</code></td><td><code>/api/status</code></td><td>None</td><td><code>200 OK</code></td><td>Returns platform project counts and active storage engine.</td></tr>
+                <tr><td><code>GET</code></td><td><code>/api/db-status</code></td><td>None</td><td><code>200 OK</code></td><td>PostgreSQL connection probe and live row count.</td></tr>
+                <tr><td><code>GET</code></td><td><code>/api/projects</code></td><td><code>platform, q, limit, offset</code></td><td><code>200 OK</code></td><td>Paginated search-filtered opportunities.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/match</code></td><td><code>{user_skills, platform, limit}</code></td><td><code>200 OK</code></td><td>Computes fit scores, matched skills, and reasons.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/generate-proposal</code></td><td><code>{title, brief, skills, profile, tone}</code></td><td><code>200 OK</code></td><td>Generates tailored proposal via GLM AI or Smart Engine.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/auth/register</code></td><td><code>{full_name, email, password}</code></td><td><code>200 OK</code></td><td>Registers user and dispatches 6-digit email OTP.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/auth/verify-otp</code></td><td><code>{email, otp}</code></td><td><code>200 OK</code></td><td>Verifies OTP hash and activates user account.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/scrape</code></td><td><code>{platforms, wait}</code></td><td><code>202 Accepted</code></td><td>Triggers background Scrapy multi-spider execution.</td></tr>
+                <tr><td><code>POST</code></td><td><code>/api/sync-json-to-db</code></td><td>None</td><td><code>200 OK</code></td><td>Synchronizes local JSON cache into PostgreSQL.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch6-2">
+          <h3>6.2 Automated Test Suite Results (100% Pass Rate)</h3>
+          <p>
+            The platform includes an automated end-to-end integration test harness (<code>test_suite.py</code>) validating all critical paths:
+          </p>
+
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Test Case ID</th><th>Target Endpoint / Scenario</th><th>Evaluation Criterion</th><th>Result Status</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>TC-01</strong></td><td><code>GET /</code></td><td>Redirects to OpenAPI Swagger UI documentation with status 200.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-02</strong></td><td><code>GET /api/status</code></td><td>Returns all 4 platforms with non-zero project counts.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-03</strong></td><td><code>GET /api/db-status</code></td><td>Confirms active PostgreSQL connection and table health.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-04</strong></td><td><code>POST /api/match</code></td><td>Validates match score calculation, clamping, and reasons array.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-05</strong></td><td><code>POST /api/generate-proposal</code></td><td>Generates structured proposal matching project brief &amp; profile.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-06</strong></td><td><code>POST /api/auth/register</code></td><td>Enforces password complexity; hashes password; writes OTP record.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-07</strong></td><td><code>POST /api/auth/verify-otp</code></td><td>Validates 6-digit SHA-256 hash and updates <code>is_verified</code>.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-08</strong></td><td>Anti-Brute-Force Lockout</td><td>Locks account and revokes OTP after 5 consecutive failed attempts.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+                <tr><td><strong>TC-09</strong></td><td>PostgreSQL Deduplication</td><td>Asserts duplicate URLs update <code>updated_at</code> without adding rows.</td><td><span class="badge" style="background:#E2F7E2;color:#146C14;border-color:#B3E6B3;">PASS</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="ch6-3">
+          <h3>6.3 DevOps, CI/CD Pipeline & Disaster Recovery</h3>
+          <p>
+            The production deployment utilizes a multi-stage pipeline:
+          </p>
+          <ol>
+            <li><strong>Continuous Integration:</strong> Static code analysis (<code>flake8</code>, <code>eslint</code>) followed by automated test execution (<code>python test_suite.py</code>).</li>
+            <li><strong>Continuous Delivery:</strong> Production bundling with Vite (<code>npm run build</code>) creating minified assets in <code>dist/</code>.</li>
+            <li><strong>Zero-Downtime Resilience:</strong> Dual-layer storage guarantees that even during cold database restarts, the API serves real-time reads from cached JSON files without returning 500 errors.</li>
+          </ol>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script>
+    // Scroll Reading Progress Indicator
+    window.addEventListener('scroll', () => {
+      const winScroll = document.documentElement.scrollTop || document.body.scrollTop;
+      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const scrolled = (winScroll / height) * 100;
+      document.getElementById('progress-bar').style.width = scrolled + '%';
+    });
+  </script>
+</body>
+</html>
